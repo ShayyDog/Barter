@@ -9,7 +9,7 @@ import jskrobo.GameStore.*;
 public class Controller<T> {
 
     public static List<Block<License>> blockchain = new ArrayList<Block<License>>();
-    public static int difficulty = 3;
+    public static int difficulty = 2;
 
     public static void main(String[] args) {
 
