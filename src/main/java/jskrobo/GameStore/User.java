@@ -1,38 +1,57 @@
 package jskrobo.GameStore;
 
 import java.util.*;
+import jskrobo.Blockchain.StringUtil;
 
 public class User {
     public static long userCount;
 
     private String username;
     private String userID;
-    private List<Game> library;
+    private int age;
+    private List<License> library;
     private List<Game> wishList;
     private List<User> friends;
 
-    public User(String name, String assignedID) {
+    public User(String name, int howOld) {
+        userCount++;
         username = name;
-        userID = assignedID;
+        age = howOld;
 
-        library = new ArrayList<Game>();
+        userID = StringUtil.applySHA256(Long.toString(userCount) + username + Integer.toString(age));
+
+        library = new ArrayList<License>();
         wishList = new ArrayList<Game>();
         friends = new ArrayList<User>();
-        userCount++;
+
+    }
+
+    public String toString() {
+        return "Username: " + username + "\nID: " + userID + "\nAge: " + age + "\n";
     }
 
     public void setUserName(String name) {
         username = name;
     }
 
-    public void addGame(Game newGame) {
-        //Add check for if game is already in library
-        library.add(newGame);
+    /**
+     * @pre newLicense is not already in the user's library
+     * @param newLicense
+     * @post newLicense is in user's library
+     */
+    public void addLicense(License newLicense) {
+        library.add(newLicense);
     }
 
-    public void removeGame(Game gameToRemove) {
-        //Add check for if game is not in library
-        library.remove(gameToRemove);
+    public void purchaseNewLicense(Game gameBuying) {
+        License newLicense = new License(gameBuying, this);
+        addLicense(newLicense);
+    }
+
+    public void exchangeLicense(License LicenseToRemove, User newUser) {
+        library.remove(LicenseToRemove);
+        LicenseToRemove.transferOwnership(newUser);
+        newUser.addLicense(LicenseToRemove);
     }
 
     public void addToWishList(Game newGame) {
@@ -50,5 +69,23 @@ public class User {
 
     public void removeFriend(User friendToRemove) {
         friends.remove(friendToRemove);
+    }
+
+    public List<License> getLibrary() {
+        return library;
+    }
+
+    public License findLicense(Game game) {
+        for (int i = 0; i < library.size(); i++) {
+            if (library.get(i).getGame().equals(game)) {
+                return library.get(i);
+            }
+        }
+
+        return new License();
+    }
+
+    public String getID() {
+        return userID;
     }
 }

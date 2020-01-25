@@ -1,22 +1,37 @@
 package jskrobo.GameStore;
 
 import java.util.*;
+import jskrobo.Blockchain.StringUtil;
+import jskrobo.Blockchain.Controller;
 
 public class License {
     private String licenseID;
     private Game game;
     private User currentOwner;
     private List<User> prevUsers;
-    private boolean isActive;
+    //private boolean isActive;
 
-    public License(Game currGame) {
-        //Generate licenseID somehow in here
-        licenseID = "placeholder";
-
+    public License(Game currGame, User newUser) {
         game = currGame;
-        isActive = false;
+        currentOwner = newUser;
+
+        licenseID = StringUtil.applySHA256(currGame.toString() + newUser.toString());
 
         prevUsers = new ArrayList<User>();
+
+        currGame.addLicense(this);
+        newUser.addLicense(this);
+
+        //Add to pending transactions to await approval
+        Controller.pending.add(this);
+    }
+
+    public void transferOwnership(User recepient) {
+        prevUsers.add(currentOwner);
+        currentOwner = recepient;
+
+        //Add to pending transactions to await approval
+        Controller.pending.add(this);
     }
 
     //Temporary constructor
@@ -25,6 +40,13 @@ public class License {
         game = null;
         currentOwner = null;
         prevUsers = new ArrayList<User>();
-        isActive = true;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public String toString() {
+        return "License ID: " + licenseID + "\nGame: " + game + "\nCurrent Owner: " + currentOwner.getID() + "\n";
     }
 }

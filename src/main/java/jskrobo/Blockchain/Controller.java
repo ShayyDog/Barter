@@ -9,26 +9,56 @@ import jskrobo.GameStore.*;
 public class Controller<T> {
 
     public static List<Block<License>> blockchain = new ArrayList<Block<License>>();
+    public static List<License> pending;
     public static int difficulty = 2;
 
     public static void main(String[] args) {
 
-        List<License> temp = new ArrayList<License>();
+        pending = new ArrayList<License>();
 
-        for (int i = 0; i < 2; i++) {
-            temp.add(new License());
-        }
+        //Example users
+        User user1 = new User("ShayyDog", 20);
+        User user2 = new User("dsboyd4", 21);
+        User user3 = new User("jcerota", 21);
+
+        //Example dev
+        Developer dev1 = new Developer("Fake Studios");
+
+        //Example games
+        Game game1 = new Game("Rust", dev1);
+        dev1.publishGame(game1);
+        Game game2 = new Game("Tarkov", dev1);
+        dev1.publishGame(game2);
+
+        //Example transactions
+        user1.purchaseNewLicense(game1);
+        user2.purchaseNewLicense(game1);
+        user3.purchaseNewLicense(game1);
+        user1.purchaseNewLicense(game2);
+
+        pending.toString();
+
 
         boolean mining = true;
-        blockchain.add(new Block(temp, "0"));
+        blockchain.add(new Block(pending, "0"));
         System.out.println("Mining block 1");
         blockchain.get(0).mineBlock(difficulty);
 
-        blockchain.add(new Block(temp, blockchain.get(blockchain.size()-1).hash));
+        pending.clear();
+
+        //More transactions
+        user1.exchangeLicense(user1.findLicense(game2), user2);
+        user3.purchaseNewLicense(game2);
+
+        pending.toString();
+
+        blockchain.add(new Block(pending, blockchain.get(blockchain.size()-1).hash));
         System.out.println("Mining block 2");
         blockchain.get(1).mineBlock(difficulty);
 
-        blockchain.add(new Block(temp, blockchain.get(blockchain.size()-1).hash));
+        pending.clear();
+
+        blockchain.add(new Block(pending, blockchain.get(blockchain.size()-1).hash));
         System.out.println("Mining block 3");
         blockchain.get(2).mineBlock(difficulty);
 
